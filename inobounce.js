@@ -2,9 +2,8 @@
  * https://github.com/lazd/iNoBounce/
  * Copyright (c) 2013 Larry Davis <lazdnet@gmail.com>; Licensed BSD */
 (function(global) {
-  // Stores the X and Y position where the touch started
+  // Stores the Y position where the touch started
   var startY = 0;
-  var startX = 0;
 
   // Store enabled status
   var enabled = false;
@@ -31,6 +30,15 @@
 
     // Check all parent elements for scrollability
     while (el !== document.body && el !== document) {
+      // Check if element has class no-inobounce, ignore our logic in that case
+      var classes = el.className.split(" ");
+      const found = classes.find(function(c) {
+        return c === "no-inobounce";
+      });
+      if (found != null) {
+        return;
+      }
+
       // Get some style properties
       var style = window.getComputedStyle(el);
 
@@ -46,23 +54,15 @@
 
       var scrolling = style.getPropertyValue("-webkit-overflow-scrolling");
       var overflowY = style.getPropertyValue("overflow-y");
-      var overflowX = style.getPropertyValue("overflow-x");
       var height = parseInt(style.getPropertyValue("height"), 10);
-      var width = parseInt(style.getPropertyValue("width"), 10);
 
       // Determine if the element should scroll
-      var isScrollable =
-        scrolling === "touch" &&
-        (overflowY === "auto" ||
-          overflowY === "scroll" ||
-          overflowX === "auto" ||
-          overflowX === "scroll");
-      var canScroll = el.scrollHeight > el.offsetHeight || el.scrollWidth > el.offsetWidth;
+      var isScrollable = scrolling === "touch" && (overflowY === "auto" || overflowY === "scroll");
+      var canScroll = el.scrollHeight > el.offsetHeight;
 
       if (isScrollable && canScroll) {
-        // Get the current Y and X position of the touch
+        // Get the current Y position of the touch
         var curY = evt.touches ? evt.touches[0].screenY : evt.screenY;
-        var curX = evt.touches ? evt.touches[0].screenX : evt.screenX;
 
         // Determine if the user is trying to scroll past the top or bottom
         // In this case, the window will bounce, so we have to prevent scrolling completely
@@ -89,7 +89,6 @@
   var handleTouchstart = function(evt) {
     // Store the first Y position of the touch
     startY = evt.touches ? evt.touches[0].screenY : evt.screenY;
-    startX = evt.touches ? evt.touches[0].screenX : evt.screenX;
   };
 
   var enable = function() {
