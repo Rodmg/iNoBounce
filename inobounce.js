@@ -31,7 +31,8 @@
     // Check all parent elements for scrollability
     while (el !== document.body && el !== document) {
       // Check if element has class no-inobounce, ignore our logic in that case
-      var classes = el.className.split(" ");
+      var className = el ? el.className : "";
+      var classes = typeof className === "string" ? className.split(" ") : [];
       const found = classes.find(function(c) {
         return c === "no-inobounce";
       });
